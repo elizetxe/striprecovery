@@ -12,7 +12,18 @@ export const metadata: Metadata = {
     "Book a licensed nurse to your Strip hotel. Aftermath from $249. 45-second form. We text back in under 60 seconds.",
 };
 
-export default function BookPage() {
+export default async function BookPage({
+  searchParams,
+}: {
+  searchParams: Promise<{
+    hotel?: string;
+    when?: string;
+    party?: string;
+    glutathione?: string;
+    vitc?: string;
+  }>;
+}) {
+  const defaults = await searchParams;
   return (
     <>
       <Pixel lander />
@@ -47,7 +58,7 @@ export default function BookPage() {
             </ul>
           </div>
           <div className="rounded-3xl border border-[var(--hair)] bg-[rgba(10,8,14,0.82)] p-5 backdrop-blur-xl md:p-7">
-            <BookFormFrame variant="page" />
+            <BookFormFrame variant="page" defaults={defaults} />
           </div>
         </div>
       </main>

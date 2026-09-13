@@ -1,6 +1,6 @@
 "use client";
 
-import { useRouter, useSearchParams } from "next/navigation";
+import { useRouter } from "next/navigation";
 import { useMemo, useState, useTransition } from "react";
 import {
   offer,
@@ -14,35 +14,40 @@ import {
 import { stripHotels } from "@/lib/hotels";
 import { EVENTS, readAttribution, track } from "./track-client";
 
-type Props = {
-  variant?: "card" | "page";
-  defaultParty?: string;
+export type BookFormDefaults = {
+  hotel?: string;
+  when?: string;
+  party?: string;
+  glutathione?: string;
+  vitc?: string;
 };
 
-function isWhen(v: string | null): v is WhenId {
+type Props = {
+  variant?: "card" | "page";
+  defaults?: BookFormDefaults;
+};
+
+function isWhen(v: string | undefined): v is WhenId {
   return whenOptions.some((o) => o.id === v);
 }
-function isParty(v: string | null): v is PartyId {
+function isParty(v: string | undefined): v is PartyId {
   return partyOptions.some((o) => o.id === v);
 }
 
-export function BookForm({ variant = "card", defaultParty }: Props) {
+export function BookForm({ variant = "card", defaults = {} }: Props) {
   const router = useRouter();
-  const params = useSearchParams();
   const [pending, start] = useTransition();
   const [error, setError] = useState("");
 
-  const initialWhen = isWhen(params.get("when")) ? params.get("when")! : "asap";
-  const initialParty = isParty(params.get("party") ?? defaultParty ?? null)
-    ? ((params.get("party") ?? defaultParty) as PartyId)
-    : "1";
+  const initialWhen = isWhen(defaults.when) ? defaults.when : "asap";
+  const initialParty = isParty(defaults.party) ? defaults.party : "1";
 
-  const [when, setWhen] = useState<WhenId>(initialWhen as WhenId);
+  const [when, setWhen] = useState<WhenId>(initialWhen);
   const [party, setParty] = useState<PartyId>(initialParty);
   const [addons, setAddons] = useState<AddonId[]>(() => {
     const next: AddonId[] = [];
-    if (params.get("glutathione") === "1") next.push("glutathione");
-    if (params.get("vitc") === "1") next.push("vitc");
+    if (defaults.glutathione === "1") next.push("glutathione");
+    if (defaults.vitc === "1") next.push("vitc");
     return next;
   });
 
@@ -161,7 +166,7 @@ export function BookForm({ variant = "card", defaultParty }: Props) {
             name="hotel"
             list="strip-hotels"
             required
-            defaultValue={params.get("hotel") ?? ""}
+            defaultValue={defaults.hotel ?? ""}
             className="field mt-1.5"
             placeholder="Bellagio, Wynn, Aria…"
           />
