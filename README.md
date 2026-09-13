@@ -1,36 +1,61 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Strip Recovery
 
-## Getting Started
+High-intent lander for Meta / Partnership Ads. One job: **book Aftermath to a Strip hotel**.
 
-First, run the development server:
+Brand: darker night-to-morning, neon gold on black, discreet hotel-corridor energy. Fulfillment is the same Las Vegas partner network as Longevity Vegas.
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+## Conversion map
+
+| Traffic | Land | Action |
+|---|---|---|
+| Cold Meta (local / Strip) | `/` | Form in the hero. Sticky Book on mobile. |
+| High-intent / retarget | `/book` | Form only. |
+| Post-submit | `/thank-you?code=SR-XXXX` | Code + what happens next. |
+
+Events: `LanderView`, `BookClick`, `BookSubmit` (also Meta `PageView`, `InitiateCheckout`, `Lead` when a pixel ID is set).
+
+UTMs and `fbclid` persist in `sessionStorage` and ride along as hidden attribution on submit.
+
+Coupon prefix: `SR-`.
+
+## Edit without hunting files
+
+All prices, phone, hours, add-ons, quiz URL, and partner disclaimer live in `lib/config.ts`.
+
+Hotel list: `lib/hotels.ts`. FAQ: `lib/faq.ts`.
+
+## Make bookings actually ring a phone / inbox
+
+The form is live. Leads POST `/api/book` and always get a coupon. Wire ops with env:
+
+```
+BOOKING_WEBHOOK_URL=     # Zapier / Make / partner intake
+RESEND_API_KEY=          # emails BOOKING_NOTIFY_EMAIL
+NEXT_PUBLIC_META_PIXEL_ID=
+NEXT_PUBLIC_PHONE_TEL=   # CallRail tracking number, E.164
+NEXT_PUBLIC_PHONE_DISPLAY=
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Until `NEXT_PUBLIC_PHONE_TEL` is set, Call CTAs stay hidden so ads never dial a dead line. The form is the conversion.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## Meta ads
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+Primary text / headline should match the lander:
 
-## Learn More
+- “Feeling wrecked on the Strip?”
+- “Licensed nurse to your hotel. From $249. No travel fee.”
+- “We come to you.”
 
-To learn more about Next.js, take a look at the following resources:
+Do **not** say cures hangover, treats alcohol poisoning, medical detox, or diagnose. Allowed: feel more like yourself, rehydrate & reset, post-celebration wellness.
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+Suggested URL: `https://<domain>/?utm_source=meta&utm_medium=paid&utm_campaign=strip_aftermath&utm_content={{ad.name}}`
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+CAPI: send `Lead` from the webhook on `BookSubmit` with the same `event_id` you later add to the pixel — placeholder for Josh. Pixel-only is enough to start.
 
-## Deploy on Vercel
+## Compliance
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+Adults 18+ only. Footer disclaimer on every page. No fake studies, no % improvement, no invented reviews.
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+## Stack
+
+Next.js App Router, Tailwind v4, one form, one API route. Deploy on Vercel.
