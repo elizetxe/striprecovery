@@ -41,7 +41,7 @@ export async function POST(req: Request) {
   }
 
   if (str(body.company)) {
-    return NextResponse.json({ ok: true, code: makeCoupon("HONEYPOT") });
+    return NextResponse.json({ ok: true, code: makeCoupon() });
   }
 
   const name = str(body.name);
@@ -66,7 +66,7 @@ export async function POST(req: Request) {
 
   const allowedAddons = new Set(offer.addons.map((a) => a.id));
   const cleanAddons = addons.filter((id) => allowedAddons.has(id as typeof offer.addons[number]["id"]));
-  const code = makeCoupon(`${phone}${Date.now()}`);
+  const code = makeCoupon();
 
   const attr: Record<string, string> = {};
   for (const key of ATTR_KEYS) {
